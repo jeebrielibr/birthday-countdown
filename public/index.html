@@ -358,7 +358,7 @@
                         <option value="" disabled selected>Tanggal</option>
                     </select>
                 </div>
-                <p class="birthday-info">Masukkan tanggal lahir Anda, sistem akan menghitung mundur ke ulang tahun berikutnya.</p>
+                <p class="birthday-info">Masukkan tanggal lahir kamu dan aku akan menghitung mundur ke ulang tahun berikutnya.</p>
             </div>
             
             <button id="start-countdown">Mulai Hitung Mundur!</button>
@@ -484,7 +484,7 @@
             yearSelect.innerHTML = '<option value="" disabled selected>Tahun</option>';
             
             // Mulai dari 100 tahun yang lalu sampai tahun sekarang
-            for(let i = currentYear - 100; i <= currentYear; i++) {
+            for(let i = currentYear - 80; i <= currentYear; i++) {
                 const option = document.createElement('option');
                 option.value = i;
                 option.textContent = i;
