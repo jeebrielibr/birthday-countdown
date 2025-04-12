@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penghitung Mundur Ulang Tahun</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: white;
+            position: relative;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+            padding: 2rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        label {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        input {
+            padding: 0.8rem;
+            border: none;
+            border-radius: 10px;
+            outline: none;
+            font-size: 1.1rem;
+            text-align: center;
+            width: 100%;
+            max-width: 300px;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+        }
+        
+        button {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            margin-top: 1rem;
+        }
+        
+        button:hover {
+            background-color: #ff5252;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .countdown-container {
+            display: none;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .countdown-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            min-width: 90px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            animation: pulse 2s infinite;
+        }
+        
+        .countdown-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .countdown-label {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .message {
+            margin-top: 2rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            position: absolute;
+            top: -10px;
+            z-index: 0;
+        }
+        
+        .progress-container {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 2rem;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 5px;
+            position: relative;
+            overflow: hidden;
+            height: 20px;
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            border-radius: 50px;
+            transition: width 0.5s ease;
+            width: 0%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.2) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.2) 50%,
+                rgba(255, 255, 255, 0.2) 75%,
+                transparent 75%,
+                transparent
+            );
+            background-size: 20px 20px;
+            animation: moveStripes 2s linear infinite;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes moveStripes {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 20px 0;
+            }
+        }
+        
+        .balloon {
+            position: absolute;
+            width: 40px;
+            height: 50px;
+            background-color: #ff6b6b;
+            border-radius: 50%;
+            animation: float 15s ease-in-out infinite;
+            opacity: 0.7;
+            z-index: 0;
+        }
+        
+        .balloon::before {
+            content: '';
+            position: absolute;
+            width: 5px;
+            height: 15px;
+            background-color: rgba(255, 255, 255, 0.7);
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+            }
+            100% {
+                transform: translateY(-200px) translateX(50px);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .countdown-box {
+                min-width: 80px;
+            }
+            
+            .countdown-value {
+                font-size: 2rem;
+            }
+
+            .countdown-container {
+                gap: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .countdown-box {
+                min-width: 70px;
+                padding: 0.8rem;
+            }
+            
+            .countdown-value {
+                font-size: 1.7rem;
+            }
+
+            .countdown-container {
+                gap: 0.7rem;
+            }
+        }
+
+        /* Tambahan untuk input tanggal lahir */
+        .date-picker-wrapper {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .date-picker-wrapper select {
+            padding: 0.8rem;
+            border: none;
+            border-radius: 10px;
+            outline: none;
+            font-size: 1.1rem;
+            background-color: white;
+            width: auto;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .date-picker-wrapper select:focus {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+        }
+
+        .birthday-info {
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Penghitung Mundur Ulang Tahun</h1>
+        
+        <div class="input-container" id="input-form">
+            <div class="input-group">
+                <label for="name">Nama Kamu</label>
+                <input type="text" id="name" placeholder="Masukkan namamu" required>
+            </div>
+            
+            <div class="input-group">
+                <label for="birthday">Tanggal Ulang Tahun</label>
+                <div class="date-picker-wrapper">
+                    <select id="year" required>
+                        <option value="" disabled selected>Tahun</option>
+                    </select>
+                    <select id="month" required>
+                        <option value="" disabled selected>Bulan</option>
+                    </select>
+                    <select id="day" required>
+                        <option value="" disabled selected>Tanggal</option>
+                    </select>
+                </div>
+                <p class="birthday-info">Masukkan tanggal lahir Anda, sistem akan menghitung mundur ke ulang tahun berikutnya.</p>
+            </div>
+            
+            <button id="start-countdown">Mulai Hitung Mundur!</button>
+        </div>
+        
+        <div class="countdown-container" id="countdown">
+            <div class="countdown-box">
+                <div class="countdown-value" id="months">00</div>
+                <div class="countdown-label">Bulan</div>
+            </div>
+            
+            <div class="countdown-box">
+                <div class="countdown-value" id="weeks">00</div>
+                <div class="countdown-label">Pekan</div>
+            </div>
+            
+            <div class="countdown-box">
+                <div class="countdown-value" id="days">00</div>
+                <div class="countdown-label">Hari</div>
+            </div>
+            
+            <div class="countdown-box">
+                <div class="countdown-value" id="hours">00</div>
+                <div class="countdown-label">Jam</div>
+            </div>
+            
+            <div class="countdown-box">
+                <div class="countdown-value" id="minutes">00</div>
+                <div class="countdown-label">Menit</div>
+            </div>
+            
+            <div class="countdown-box">
+                <div class="countdown-value" id="seconds">00</div>
+                <div class="countdown-label">Detik</div>
+            </div>
+        </div>
+        
+        <div class="progress-container" id="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+            <div class="progress-text" id="progress-text">0%</div>
+        </div>
+        
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+        // Element references
+        const inputForm = document.getElementById('input-form');
+        const countdownElement = document.getElementById('countdown');
+        const nameInput = document.getElementById('name');
+        const daySelect = document.getElementById('day');
+        const monthSelect = document.getElementById('month');
+        const yearSelect = document.getElementById('year');
+        const startButton = document.getElementById('start-countdown');
+        const monthsElement = document.getElementById('months');
+        const weeksElement = document.getElementById('weeks');
+        const daysElement = document.getElementById('days');
+        const hoursElement = document.getElementById('hours');
+        const minutesElement = document.getElementById('minutes');
+        const secondsElement = document.getElementById('seconds');
+        const messageElement = document.getElementById('message');
+        const progressContainer = document.getElementById('progress-container');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        
+        let countdownInterval;
+        let birthdayDate;
+        let userName;
+        
+        // Mengisi opsi tanggal
+        function populateDays() {
+            daySelect.innerHTML = '<option value="" disabled selected>Tanggal</option>';
+            
+            const selectedMonth = parseInt(monthSelect.value);
+            const selectedYear = parseInt(yearSelect.value);
+            
+            if (!selectedMonth || !selectedYear) {
+                return;
+            }
+            
+            let daysInMonth = 31;
+            
+            if(selectedMonth === 4 || selectedMonth === 6 || selectedMonth === 9 || selectedMonth === 11) {
+                daysInMonth = 30;
+            } else if(selectedMonth === 2) {
+                // Pengecekan tahun kabisat
+                if((selectedYear % 4 === 0 && selectedYear % 100 !== 0) || selectedYear % 400 === 0) {
+                    daysInMonth = 29;
+                } else {
+                    daysInMonth = 28;
+                }
+            }
+            
+            for(let i = 1; i <= daysInMonth; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                daySelect.appendChild(option);
+            }
+        }
+        
+        // Mengisi opsi bulan
+        function populateMonths() {
+            const months = [
+                "Januari", "Februari", "Maret", "April", 
+                "Mei", "Juni", "Juli", "Agustus",
+                "September", "Oktober", "November", "Desember"
+            ];
+            
+            monthSelect.innerHTML = '<option value="" disabled selected>Bulan</option>';
+            
+            for(let i = 0; i < months.length; i++) {
+                const option = document.createElement('option');
+                option.value = i + 1;
+                option.textContent = months[i];
+                monthSelect.appendChild(option);
+            }
+        }
+        
+        // Mengisi opsi tahun
+        function populateYears() {
+            const currentYear = new Date().getFullYear();
+            yearSelect.innerHTML = '<option value="" disabled selected>Tahun</option>';
+            
+            // Mulai dari 100 tahun yang lalu sampai tahun sekarang
+            for(let i = currentYear - 100; i <= currentYear; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                yearSelect.appendChild(option);
+            }
+        }
+        
+        // Inisialisasi dropdown
+        populateYears();
+        populateMonths();
+        
+        // Event listeners untuk dropdown
+        monthSelect.addEventListener('change', populateDays);
+        yearSelect.addEventListener('change', populateDays);
+        
+        // Create balloons
+        function createBalloons() {
+            const colors = ['#ff6b6b', '#feca57', '#1dd1a1', '#5f27cd', '#54a0ff'];
+            
+            for (let i = 0; i < 10; i++) {
+                const balloon = document.createElement('div');
+                balloon.classList.add('balloon');
+                balloon.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                balloon.style.left = `${Math.random() * 100}vw`;
+                balloon.style.animationDelay = `${Math.random() * 10}s`;
+                balloon.style.animationDuration = `${15 + Math.random() * 10}s`;
+                document.body.appendChild(balloon);
+            }
+        }
+        
+        createBalloons();
+        
+        // Create confetti
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#feca57', '#1dd1a1', '#5f27cd', '#54a0ff'];
+            
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.classList.add('confetti');
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.left = `${Math.random() * 100}vw`;
+                    
+                    const size = Math.random() * 10 + 5;
+                    confetti.style.width = `${size}px`;
+                    confetti.style.height = `${size}px`;
+                    
+                    // Add random rotation
+                    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    
+                    // Set random shapes (square, circle, triangle)
+                    const shapes = ['50%', '0%'];
+                    confetti.style.borderRadius = shapes[Math.floor(Math.random() * shapes.length)];
+                    
+                    document.body.appendChild(confetti);
+                    
+                    // Animate falling with physics
+                    const duration = Math.random() * 3 + 2;
+                    const horizontalMovement = (Math.random() - 0.5) * 100;
+                    
+                    confetti.animate(
+                        [
+                            { transform: 'translateY(0) translateX(0) rotate(0deg)', opacity: 1 },
+                            { transform: `translateY(100vh) translateX(${horizontalMovement}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+                        ],
+                        {
+                            duration: duration * 1000,
+                            easing: 'cubic-bezier(0.4, 0.0, 0.2, 1)'
+                        }
+                    );
+                    
+                    // Remove confetti after animation
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, duration * 1000);
+                }, i * 50);
+            }
+        }
+        
+        // Start countdown when button is clicked
+        startButton.addEventListener('click', function() {
+            if (!nameInput.value || !daySelect.value || !monthSelect.value || !yearSelect.value) {
+                alert('Mohon isi semua data terlebih dahulu!');
+                return;
+            }
+            
+            userName = nameInput.value;
+            
+            // Buat tanggal dari pemilihan dropdown
+            const selectedDay = parseInt(daySelect.value);
+            const selectedMonth = parseInt(monthSelect.value) - 1; // Bulan di JavaScript dimulai dari 0
+            const selectedYear = parseInt(yearSelect.value);
+            
+            // Tanggal lahir lengkap
+            const birthDate = new Date(selectedYear, selectedMonth, selectedDay);
+            
+            // Menentukan tanggal ulang tahun berikutnya
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            
+            // Buat tanggal ulang tahun untuk tahun ini
+            const nextBirthday = new Date(currentYear, selectedMonth, selectedDay);
+            
+            // Jika tanggal ulang tahun sudah lewat tahun ini, tambahkan 1 tahun
+            if (nextBirthday < currentDate) {
+                nextBirthday.setFullYear(currentYear + 1);
+            }
+            
+            birthdayDate = nextBirthday;
+            
+            // Hide input form, show countdown
+            inputForm.style.display = 'none';
+            countdownElement.style.display = 'flex';
+            progressContainer.style.display = 'block';
+            
+            // Start countdown
+            updateCountdown();
+            countdownInterval = setInterval(updateCountdown, 1000);
+            
+            // Show message
+            const birthdayMonth = birthdayDate.toLocaleString('id-ID', { month: 'long' });
+            const birthdayDay = birthdayDate.getDate();
+            const birthYear = birthDate.getFullYear();
+            const nextAge = birthdayDate.getFullYear() - birthYear;
+            
+            messageElement.textContent = `${userName}, menghitung mundur ke ulang tahunmu yang ke-${nextAge} pada ${birthdayDay} ${birthdayMonth}!`;
+            
+            setTimeout(() => {
+                messageElement.classList.add('visible');
+            }, 500);
+        });
+        
+        // Update countdown function
+        function updateCountdown() {
+            const currentTime = new Date();
+            const timeDifference = birthdayDate - currentTime;
+            
+            if (timeDifference <= 0) {
+                // Birthday reached
+                clearInterval(countdownInterval);
+                monthsElement.textContent = '00';
+                weeksElement.textContent = '00';
+                daysElement.textContent = '00';
+                hoursElement.textContent = '00';
+                minutesElement.textContent = '00';
+                secondsElement.textContent = '00';
+                
+                messageElement.textContent = `Selamat Ulang Tahun, ${userName}! 🎉`;
+                createConfetti();
+                
+                progressBar.style.width = '100%';
+                progressText.textContent = '100%';
+                
+                return;
+            }
+            
+            // Calculate time remaining
+            const totalDays = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+            
+            // Calculate months (approximate)
+            const months = Math.floor(totalDays / 30);
+            
+            // Calculate remaining days after months are accounted for
+            const remainingDaysAfterMonths = totalDays % 30;
+            
+            // Calculate weeks from remaining days
+            const weeks = Math.floor(remainingDaysAfterMonths / 7);
+            
+            // Calculate remaining days after weeks are accounted for
+            const days = remainingDaysAfterMonths % 7;
+            
+            const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+            
+            // Update countdown elements with leading zeros
+            monthsElement.textContent = months.toString().padStart(2, '0');
+            weeksElement.textContent = weeks.toString().padStart(2, '0');
+            daysElement.textContent = days.toString().padStart(2, '0');
+            hoursElement.textContent = hours.toString().padStart(2, '0');
+            minutesElement.textContent = minutes.toString().padStart(2, '0');
+            secondsElement.textContent = seconds.toString().padStart(2, '0');
+            
+            // Calculate percentage until birthday
+            // Assume a year as max period (even if birthday is sooner)
+            const oneYear = 365 * 24 * 60 * 60 * 1000;
+            const fullDateNow = new Date();
+            
+            // Create a date one year from now
+            const oneYearFromNow = new Date(fullDateNow);
+            oneYearFromNow.setFullYear(fullDateNow.getFullYear() + 1);
+            
+            // Calculate progress percentage
+            let percentage;
+            if (birthdayDate < oneYearFromNow) {
+                // Calculate how much time has passed since exactly one year before birthday
+                const totalPeriod = birthdayDate - new Date(birthdayDate.getTime() - oneYear);
+                const elapsedPeriod = currentTime - new Date(birthdayDate.getTime() - oneYear);
+                percentage = Math.min(100, Math.max(0, Math.floor((elapsedPeriod / totalPeriod) * 100)));
+            } else {
+                percentage = 0;
+            }
+            
+            // Update progress bar
+            progressBar.style.width = `${percentage}%`;
+            progressText.textContent = `${percentage}%`;
+            
+            // Update message based on time remaining
+            if (months === 0 && weeks === 0 && days === 0 && hours === 0 && minutes === 0) {
+                messageElement.textContent = `${userName}, tinggal ${seconds} detik lagi menuju ulang tahunmu!`;
+            } else if (months === 0 && weeks === 0 && days === 0 && hours === 0) {
+                messageElement.textContent = `${userName}, tinggal ${minutes} menit ${seconds} detik lagi menuju ulang tahunmu!`;
+            } else if (months === 0 && weeks === 0 && days === 0) {
+                messageElement.textContent = `${userName}, tinggal ${hours} jam ${minutes} menit lagi menuju ulang tahunmu!`;
+            } else if (months === 0 && weeks === 0) {
+                messageElement.textContent = `${userName}, tinggal ${days} hari ${hours} jam lagi menuju ulang tahunmu!`;
+            } else if (months === 0) {
+                messageElement.textContent = `${userName}, tinggal ${weeks} pekan ${days} hari lagi menuju ulang tahunmu!`;
+            }
+        }
+    </script>
+</body>
+</html>
